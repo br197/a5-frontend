@@ -1,5 +1,9 @@
 import { Authing } from "./app";
+import { CommentAuthorNotMatchError, CommentDoc } from "./concepts/commenting";
 import { AlreadyFriendsError, FriendNotFoundError, FriendRequestAlreadyExistsError, FriendRequestDoc, FriendRequestNotFoundError } from "./concepts/friending";
+import { GroupDoc } from "./concepts/grouping";
+import { MapDoc } from "./concepts/mapping";
+import { MilestoneDoc } from "./concepts/milestoning";
 import { PostAuthorNotMatchError, PostDoc } from "./concepts/posting";
 import { Router } from "./framework/router";
 
@@ -20,11 +24,81 @@ export default class Responses {
   }
 
   /**
+   * Convert CommentDoc into more readable format for the frontend by converting the author id into a username.
+   */
+  static async comment(comment: CommentDoc | null) {
+    if (!comment) {
+      return comment;
+    }
+    const author = await Authing.getUserById(comment.author);
+    return { ...comment, author: author.username };
+  }
+
+  /**
+   * Convert GroupDoc into more readable format for the frontend.
+   */
+  static async group(group: GroupDoc | null) {
+    if (!group) {
+      return group;
+    }
+    return { ...group };
+  }
+
+  /**
+   * Convert MilestoneDoc into more readable format for the frontend.
+   */
+  static async milestone(milestone: MilestoneDoc | null) {
+    if (!milestone) {
+      return milestone;
+    }
+    return { ...milestone };
+  }
+
+  /**
+   * Convert MapDoc into more readable format for the frontend.
+   */
+  static async map(map: MapDoc | null) {
+    if (!map) {
+      return map;
+    }
+    return { ...map };
+  }
+
+  /**
    * Same as {@link post} but for an array of PostDoc for improved performance.
    */
   static async posts(posts: PostDoc[]) {
     const authors = await Authing.idsToUsernames(posts.map((post) => post.author));
     return posts.map((post, i) => ({ ...post, author: authors[i] }));
+  }
+
+  /**
+   * Display information for array of comments.
+   */
+  static async comments(comments: CommentDoc[]) {
+    const authors = await Authing.idsToUsernames(comments.map((comment) => comment.author));
+    return comments.map((comment, i) => ({ ...comment, author: authors[i] }));
+  }
+
+  /**
+   * Display information for array of groups.
+   */
+  static async groups(groups: GroupDoc[]) {
+    return groups.map((group) => ({ ...group }));
+  }
+
+  /**
+   * Display information for array of milestones.
+   */
+  static async milestones(milestones: MilestoneDoc[]) {
+    return milestones.map((milestone) => ({ ...milestone }));
+  }
+
+  /**
+   * Display information for array of maps.
+   */
+  static async maps(maps: MapDoc[]) {
+    return maps.map((map) => ({ ...map }));
   }
 
   /**
@@ -40,6 +114,11 @@ export default class Responses {
 }
 
 Router.registerError(PostAuthorNotMatchError, async (e) => {
+  const username = (await Authing.getUserById(e.author)).username;
+  return e.formatWith(username, e._id);
+});
+
+Router.registerError(CommentAuthorNotMatchError, async (e) => {
   const username = (await Authing.getUserById(e.author)).username;
   return e.formatWith(username, e._id);
 });
