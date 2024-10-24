@@ -35,7 +35,7 @@ export default class GroupingConcept {
   */
   async getUserGroups(_id: ObjectId) {
     const group = await this.groups.readMany({});
-    var userGroups: Array<GroupDoc> = [];
+    const userGroups: Array<GroupDoc> = [];
     if (group) {
       for (var g of group) {
         if (g.groupMembers.some((member) => member.toString() === _id.toString() || g.groupOwner.toString() === _id.toString())) {
@@ -87,10 +87,10 @@ export default class GroupingConcept {
   /*
   Join a user group.
   */
-  async joinGroup(addedGroupMember: ObjectId, groupName: string) {
-    const group = await this.groups.readOne({ groupName });
+  async joinGroup(addedGroupMember: ObjectId, _id: ObjectId) {
+    const group = await this.groups.readOne({ _id });
     if (!group) {
-      throw new NotFoundError(`Group ${groupName} does not exist!`);
+      throw new NotFoundError(`Group does not exist!`);
     } else if (group.resource) {
       throw new Error("Users can't join resource groups!");
     } else if (group.groupMembers.some((member) => member.toString() === addedGroupMember.toString()) || group.groupOwner.toString() === addedGroupMember.toString()) {
@@ -98,8 +98,8 @@ export default class GroupingConcept {
     }
     const groupMembers: Array<ObjectId> = group.groupMembers;
     groupMembers.push(addedGroupMember);
-    await this.groups.partialUpdateOne({ groupName }, { groupMembers });
-    return { msg: "Members successfully joined!", group: await this.groups.readOne({ groupName }) };
+    await this.groups.partialUpdateOne({ _id }, { groupMembers });
+    return { msg: "Members successfully joined!", group: await this.groups.readOne({ _id }) };
   }
 
   /*
@@ -119,18 +119,18 @@ export default class GroupingConcept {
   /*
   Leave a user group.
   */
-  async leaveGroup(_id: ObjectId, groupName: string) {
-    const group = await this.groups.readOne({ groupName });
+  async leaveGroup(user: ObjectId, _id: ObjectId) {
+    const group = await this.groups.readOne({ _id });
     if (!group) {
-      throw new NotFoundError(`Group ${groupName} does not exist!`);
-    } else if (group.groupMembers.some((member) => member.toString() === _id.toString())) {
-      const index = group.groupMembers.findIndex((member) => member.toString() === _id.toString());
+      throw new NotFoundError(`Group does not exist!`);
+    } else if (group.groupMembers.some((member) => member.toString() === user.toString())) {
+      const index = group.groupMembers.findIndex((member) => member.toString() === user.toString());
       group.groupMembers.splice(index, 1);
-      await this.groups.partialUpdateOne({ groupName }, { groupMembers: group.groupMembers });
+      await this.groups.partialUpdateOne({ _id }, { groupMembers: group.groupMembers });
     } else {
       throw new NotFoundError(`Unable to delete user from group, because user not in group!`);
     }
-    return { msg: `User successfully left the ${groupName} group!` };
+    return { msg: `User successfully left the ${group.groupName} group!` };
   }
 
   /*

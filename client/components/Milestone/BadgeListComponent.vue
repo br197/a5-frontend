@@ -8,19 +8,17 @@ import { onBeforeMount, ref } from "vue";
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
-let badges = ref<Array<Record<string, string>>>([]);
+let badges = ref<Record<string, boolean>>([]);
 
 async function getBadges() {
-  let query: Record<string, string> = author !== undefined ? { author } : {};
   let badgeResults;
   try {
-    badgeResults = await fetchy("/api/milestones:id", "GET");
+    badgeResults = await fetchy("/api/milestones", "GET");
   } catch (_) {
     return;
   }
-  badges.value = badgeResults;
+  badges.value = Object.entries(badgeResults.userMilestones);
 }
-
 onBeforeMount(async () => {
   await getBadges();
   loaded.value = true;
@@ -28,9 +26,9 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-  <section class="badges" v-if="loaded && posts.length !== 0">
-    <article v-for="b in badges" :key="b._id">
-      <BadgeComponent v-if="editing !== b._id" :b="badge" @refreshPosts="getPosts" />
+  <section class="badges" v-if="loaded && isLoggedIn && badges.length !== 0">
+    <article v-for="badge in badges" :key="badge._id">
+      <BadgeComponent :badge="badge" />
     </article>
   </section>
   <p v-else-if="loaded">No badges found</p>

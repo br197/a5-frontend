@@ -63,7 +63,7 @@ class Routes {
     Sessioning.start(session, u._id);
     const userMilestones = await Milestoning.getBadges(u._id);
     const logIn = "Logged in!";
-    var messages = [logIn];
+    const messages = [logIn];
     if (!userMilestones) {
       await Milestoning.initializeUserMilestones(u._id);
       const milestoneMsg = await Milestoning.receiveBadge(u._id, "Getting Started: Created Account");
@@ -216,15 +216,15 @@ class Routes {
     const user = Sessioning.getUser(session);
     const posts = await Posting.getPosts();
     const comments = await Commenting.getComments();
-    var isResource: boolean = false;
-    for (var p of posts) {
+    let isResource: boolean = false;
+    for (const p of posts) {
       if (p._id.equals(resourceId)) {
         isResource = true;
         break;
       }
     }
     if (!isResource) {
-      for (var c of comments) {
+      for (const c of comments) {
         if (c._id.equals(resourceId)) {
           isResource = true;
           break;
@@ -269,11 +269,12 @@ class Routes {
     }
   }
 
-  @Router.post("/groups/addUser")
-  async joinUserGroup(session: SessionDoc, groupName: string) {
+  @Router.post("/groups/:id")
+  async joinUserGroup(session: SessionDoc, id: string) {
     const user = Sessioning.getUser(session);
     let created;
-    created = await Grouping.joinGroup(user, groupName);
+    const oid = new ObjectId(id);
+    created = await Grouping.joinGroup(user, oid);
     const messages = [created.msg];
     const userBadges = await Milestoning.getBadges(user);
     if (userBadges !== null) {
@@ -297,10 +298,11 @@ class Routes {
     return { msg: deleted.msg };
   }
 
-  @Router.patch("/groups/leave/:groupName")
-  async leaveGroup(session: SessionDoc, groupName: string) {
+  @Router.patch("/groups/:groupId")
+  async leaveGroup(session: SessionDoc, groupId: string) {
     const user = Sessioning.getUser(session);
-    const leaving = await Grouping.leaveGroup(user, groupName);
+    const oid = new ObjectId(groupId);
+    const leaving = await Grouping.leaveGroup(user, oid);
     return { msg: leaving.msg };
   }
 
@@ -311,7 +313,7 @@ class Routes {
     return { msg: leaving.msg };
   }
 
-  @Router.patch("/groups/name/:groupName")
+  @Router.patch("/groups/name/:id")
   async editGroupName(session: SessionDoc, id: string, groupName: string) {
     const groupOwner = Sessioning.getUser(session);
     const oid = new ObjectId(id);
@@ -319,7 +321,7 @@ class Routes {
     return await Grouping.editGroupName(oid, groupName);
   }
 
-  @Router.patch("/groups/description/:groupDescription")
+  @Router.patch("/groups/description/:id")
   async editGroupDescription(session: SessionDoc, id: string, groupDescription: string) {
     const groupOwner = Sessioning.getUser(session);
     const oid = new ObjectId(id);
@@ -327,11 +329,18 @@ class Routes {
     return await Grouping.editGroupDescription(oid, groupDescription);
   }
 
-  @Router.get("/milestones/:id")
+  @Router.get("/milestones")
   async getMilestones(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     const milestones = await Milestoning.getBadges(user);
     return Responses.milestone(milestones);
+  }
+
+  @Router.get("/comments")
+  async getComments() {
+    let comments;
+    comments = await Commenting.getComments();
+    return Responses.comments(comments);
   }
 
   @Router.get("/comment/:username")
@@ -342,11 +351,20 @@ class Routes {
     return Responses.comments(comments);
   }
 
-  @Router.post("/comment")
-  async createComment(session: SessionDoc, content: string, postId: ObjectId) {
+  @Router.get("/comments/:id")
+  async getCommentsId(id: string) {
+    let comments;
+    const oid = new ObjectId(id);
+    comments = await Commenting.getCommentByPostId(oid);
+    return await Responses.comments(comments);
+  }
+
+  @Router.post("/comment/:id")
+  async createComment(session: SessionDoc, content: string, postId: string) {
     //create comments
     const user = Sessioning.getUser(session);
-    const created = await Commenting.addComment(user, content, postId);
+    const oid = new ObjectId(postId);
+    const created = await Commenting.addComment(user, content, oid);
     const messages = [created.msg];
     const userBadges = await Milestoning.getBadges(user);
     if (userBadges !== null) {
@@ -363,13 +381,13 @@ class Routes {
     return { msg: messages.join(" "), comment: await Responses.comment(created.comment) };
   }
 
-  @Router.patch("/comment/:newContent")
-  async updateComment(session: SessionDoc, id: ObjectId, newContent?: string) {
+  @Router.patch("/comment/:id")
+  async updateComment(session: SessionDoc, id: ObjectId, content: string) {
     //update comment contents
     const user = Sessioning.getUser(session);
     const oid = new ObjectId(id);
     await Commenting.assertAuthorIsUser(oid, user);
-    return await Commenting.update(oid, newContent);
+    return await Commenting.update(oid, content);
   }
 
   @Router.delete("/comment/:commentId")
@@ -388,7 +406,7 @@ class Routes {
     return { msg: map.msg, map: await Responses.map(map.location) };
   }
 
-  @Router.get("/maps/:id")
+  @Router.get("/maps")
   async findNearbyUsers(session: SessionDoc, city: string, state: string) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.findNearbyUsers(user, city, state);
@@ -408,21 +426,21 @@ class Routes {
     return { msg: messages.join(" "), map: await Responses.maps(map.nearbyUsers) };
   }
 
-  @Router.get("/maps/currentLocation/:id")
+  @Router.get("/maps/currentLocation")
   async getCurrentLocation(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.getCurrentLocation(user);
     return { msg: map.msg, map: await Responses.map(map.location) };
   }
 
-  @Router.patch("/maps/:user")
+  @Router.patch("/maps")
   async updateUserLocation(session: SessionDoc, city: string, state: string) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.updateUserLocation(user, city, state);
     return { msg: map.msg, map: await Responses.map(map.location) };
   }
 
-  @Router.delete("/maps/:user")
+  @Router.delete("/maps")
   async deleteUserLocation(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.deleteUserLocation(user);

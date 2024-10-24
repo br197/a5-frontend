@@ -41,7 +41,9 @@ export default class Responses {
     if (!group) {
       return group;
     }
-    return { ...group };
+    const groupOwner = await Authing.getUserById(group.groupOwner);
+    const groupMembers = await Authing.idsToUsernames(group.groupMembers);
+    return { ...group, groupMembers: groupMembers, groupgroupOwner: groupOwner.username };
   }
 
   /**
@@ -61,7 +63,8 @@ export default class Responses {
     if (!map) {
       return map;
     }
-    return { ...map };
+    const user = await Authing.getUserById(map.user);
+    return { ...map, user: user.username };
   }
 
   /**
@@ -84,7 +87,9 @@ export default class Responses {
    * Display information for array of groups.
    */
   static async groups(groups: GroupDoc[]) {
-    return groups.map((group) => ({ ...group }));
+    const groupOwners = await Authing.idsToUsernames(groups.map((group) => group.groupOwner));
+    const groupMembers = await Promise.all(groups.map((group) => Authing.idsToUsernames(group.groupMembers)));
+    return groups.map((group, i) => ({ ...group, groupMembers: groupMembers[i], groupOwner: groupOwners[i] }));
   }
 
   /**
@@ -98,7 +103,8 @@ export default class Responses {
    * Display information for array of maps.
    */
   static async maps(maps: MapDoc[]) {
-    return maps.map((map) => ({ ...map }));
+    const users = await Authing.idsToUsernames(maps.map((user) => user.user));
+    return maps.map((map, i) => ({ ...map, user: users[i] }));
   }
 
   /**

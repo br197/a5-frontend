@@ -2,6 +2,7 @@
 import CreatePostForm from "@/components/Post/CreatePostForm.vue";
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
+import CreateCommentForm from "@/components/Comment/CreateCommentForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
@@ -14,13 +15,14 @@ const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
 let searchAuthor = ref("");
+let reply = ref("");
 
 async function getPosts(author?: string) {
   let query: Record<string, string> = author !== undefined ? { author } : {};
   let postResults;
   try {
     postResults = await fetchy("/api/posts", "GET", { query });
-  } catch (_) {
+  } catch (e) {
     return;
   }
   searchAuthor.value = author ? author : "";
@@ -29,6 +31,10 @@ async function getPosts(author?: string) {
 
 function updateEditing(id: string) {
   editing.value = id;
+}
+
+function replyToPost(id: string) {
+  reply.value = id;
 }
 
 onBeforeMount(async () => {
@@ -50,6 +56,7 @@ onBeforeMount(async () => {
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
+      <CreateCommentForm></CreateCommentForm>
       <EditPostForm v-else :post="post" @refreshPosts="getPosts" @editPost="updateEditing" />
     </article>
   </section>

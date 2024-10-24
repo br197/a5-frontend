@@ -48,6 +48,10 @@ export default class CommentingConcept {
     return await this.comments.readMany({ author });
   }
 
+  async getCommentByPostId(itemToReplyTo: ObjectId) {
+    return await this.comments.readMany({ itemToReplyTo });
+  }
+
   async assertAuthorIsUser(_id: ObjectId, user: ObjectId) {
     const comment = await this.comments.readOne({ _id });
     if (!comment) {

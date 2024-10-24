@@ -2,8 +2,11 @@ import { storeToRefs } from "pinia";
 import { createRouter, createWebHistory } from "vue-router";
 
 import { useUserStore } from "@/stores/user";
+import GroupPostsView from "../views/GroupPostsView.vue";
+import GroupView from "../views/GroupView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
+import MapView from "../views/MapView.vue";
 import MilestoneView from "../views/MilestoneView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import SettingView from "../views/SettingView.vue";
@@ -23,9 +26,27 @@ const router = createRouter({
       meta: { requiresAuth: true },
     },
     {
+      path: "/map",
+      name: "Community Map",
+      component: MapView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/milestones",
       name: "Milestones",
       component: MilestoneView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/groups",
+      name: "Groups",
+      component: GroupView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/groups/:id",
+      name: "Group Posts",
+      component: GroupPostsView,
       meta: { requiresAuth: true },
     },
     {

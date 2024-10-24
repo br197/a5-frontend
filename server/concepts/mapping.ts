@@ -43,21 +43,16 @@ export default class MappingConcept {
   /**
    * Get users near city, state.
    */
-  async findNearbyUsers(_id: ObjectId, cityString?: string, stateString?: string) {
+  async findNearbyUsers(_id: ObjectId, cityString: string, stateString: string) {
     const findUserOptIn = await this.maps.readOne({ user: _id });
     if (!findUserOptIn) {
       throw new NotAllowedError("You have not opted in your location!");
     }
-
-    if (!cityString || !stateString) {
-      const users = await this.maps.readMany({ city: findUserOptIn.city, state: findUserOptIn.state });
-      return { msg: "You have successfuly retrieved nearby users based on your opted in location!", nearbyUsers: users };
-    } else {
-      const city = cityString.toLowerCase();
-      const state = stateString.toLowerCase();
-      const users = await this.maps.readMany({ city: city, state: state });
-      return { msg: "You have successfuly retrieved nearby users!", nearbyUsers: users };
-    }
+    const city = cityString.toLowerCase();
+    const state = stateString.toLowerCase();
+    const users = await this.maps.readMany({ city: city, state: state });
+    const nearbyUsers = users.filter((user) => user.user.toString() !== _id.toString());
+    return { msg: "You have successfuly retrieved nearby users!", nearbyUsers: nearbyUsers };
   }
 
   /**
@@ -95,6 +90,6 @@ export default class MappingConcept {
       throw new NotFoundError(`Your location is not currently opted in!`);
     }
     await this.maps.deleteOne({ user: _id });
-    return { msg: `Location of user ${_id} successfully opted out!` };
+    return { msg: `Location of user successfully opted out!` };
   }
 }

@@ -5,7 +5,7 @@ import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
 
 const props = defineProps(["comment"]);
-const emit = defineEmits(["editComment", "refreshComments"]);
+const emit = defineEmits(["editComment", "createComment"]);
 const { currentUsername } = storeToRefs(useUserStore());
 
 const deleteComment = async () => {
@@ -14,7 +14,6 @@ const deleteComment = async () => {
   } catch {
     return;
   }
-  emit("refreshComments");
 };
 </script>
 
@@ -22,9 +21,10 @@ const deleteComment = async () => {
   <p class="author">{{ props.comment.author }}</p>
   <p>{{ props.comment.content }}</p>
   <div class="base">
-    <menu v-if="props.comment.author == currentUsername">
+    <menu v-if="props.comment.author === currentUsername">
       <li><button class="btn-small pure-button" @click="emit('editComment', props.comment._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="deleteComment">Delete</button></li>
+      <li><button class="btn-small pure-button" @click="emit('createComment', props.post._id)">Reply</button></li>
     </menu>
     <article class="timestamp">
       <p v-if="props.comment.dateCreated !== props.comment.dateUpdated">Edited on: {{ formatDate(props.comment.dateUpdated) }}</p>
@@ -49,7 +49,7 @@ menu {
   flex-direction: row;
   gap: 1em;
   padding: 0;
-  margin: 0;
+  margin-top: 10px;
 }
 
 .timestamp {

@@ -12,17 +12,17 @@ const { isLoggedIn } = storeToRefs(useUserStore());
 const loaded = ref(false);
 let comments = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
+const username = ref("");
 
-async function getComments(author?: string) {
-  let query: Record<string, string> = author !== undefined ? { author } : {};
+async function getComments(username: string) {
   let commentResults;
   try {
-    commentResults = await fetchy("/api/comment/:username", "GET", { query });
+    commentResults = await fetchy("/api/comment", "GET", { query: { author: username } });
   } catch (_) {
     return;
   }
-
   comments.value = commentResults;
+  username.value = username;
 }
 
 function updateEditing(id: string) {
@@ -30,7 +30,7 @@ function updateEditing(id: string) {
 }
 
 onBeforeMount(async () => {
-  await getPosts();
+  await getComments(username);
   loaded.value = true;
 });
 </script>
@@ -38,7 +38,7 @@ onBeforeMount(async () => {
 <template>
   <section v-if="isLoggedIn">
     <h2>Create a comment:</h2>
-    <CreateCommentForm @refreshPosts="getPosts" />
+    <CreateCommentForm @refreshPosts="getComments" />
   </section>
   <section class="comments" v-if="loaded && comments.length !== 0">
     <article v-for="comment in comments" :key="comment._id">
