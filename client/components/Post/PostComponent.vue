@@ -1,16 +1,18 @@
 <script setup lang="ts">
+import CommentComponent from "@/components/Comment/CommentComponent.vue";
+import CreateCommentForm from "@/components/Comment/CreateCommentForm.vue";
+import EditCommentForm from "@/components/Comment/EditCommentForm.vue";
 import { useUserStore } from "@/stores/user";
 import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-import CommentComponent from "@/components/Comment/CommentComponent.vue";
-import EditCommentForm from "@/components/Comment/EditCommentForm.vue";
-import { ref, onBeforeMount } from "vue";
 
-const props = defineProps(["post"]);
-const emit = defineEmits(["editPost", "refreshPosts", "createComment"]);
+const props = defineProps(["post", "comment"]);
+const emit = defineEmits(["editPost", "refreshPosts", "replyComment"]);
 const { currentUsername } = storeToRefs(useUserStore());
 const editing = ref("");
+const replying = ref("");
 let comments = ref<Array<Record<string, string>>>([]);
 
 const deletePost = async () => {
@@ -21,14 +23,12 @@ const deletePost = async () => {
   }
   emit("refreshPosts");
 };
-//:comments="comments.filter((comment) => comment.itemToReplyTo.toString() === post._id.toString())"
 
 async function getCommentsById() {
   let commentResults;
   try {
     commentResults = await fetchy(`/api/comments/${props.post._id}`, "GET");
   } catch (e) {
-    console.log(e);
     return;
   }
   comments.value = commentResults;
@@ -36,6 +36,10 @@ async function getCommentsById() {
 
 function updateCommenting(id: string) {
   editing.value = id;
+}
+
+function makeReply(id: string) {
+  replying.value = id;
 }
 
 onBeforeMount(async () => {
@@ -50,7 +54,7 @@ onBeforeMount(async () => {
     <menu v-if="props.post.author == currentUsername">
       <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
-      <li><button class="btn-small pure-button" @click="emit('createComment', props.post._id)">Reply</button></li>
+      <li><button class="btn-small pure-button" @click="emit('replyComment', props.post._id)">Reply</button></li>
     </menu>
     <article class="timestamp">
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
@@ -60,8 +64,9 @@ onBeforeMount(async () => {
   <section v-if="comments.length !== 0">
     <h4>Comments:</h4>
     <article v-for="comment in comments" :key="comment._id">
-      <CommentComponent v-if="editing !== comment._id" :comment="comment" @editComment="updateCommenting" />
-      <EditCommentForm v-else :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
+      <CommentComponent v-if="editing !== comment._id && replying !== comment._id && replying !== props.post._id" :comment="comment" @editComment="updateCommenting" />
+      <CreateCommentForm v-if="replying === comment._id || replying === props.post._id" :comment="comment" @replyComment="makeReply" @refreshComments="getCommentsById" />
+      <EditCommentForm v-else-if="editing === comment._id" :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
     </article>
   </section>
 </template>

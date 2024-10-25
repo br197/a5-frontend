@@ -4,8 +4,8 @@ import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
 import { fetchy } from "../../utils/fetchy";
 
-const props = defineProps(["comment"]);
-const emit = defineEmits(["editComment", "createComment"]);
+const props = defineProps(["post", "comment"]);
+const emit = defineEmits(["editComment", "replyComment"]);
 const { currentUsername } = storeToRefs(useUserStore());
 
 const deleteComment = async () => {
@@ -24,7 +24,7 @@ const deleteComment = async () => {
     <menu v-if="props.comment.author === currentUsername">
       <li><button class="btn-small pure-button" @click="emit('editComment', props.comment._id)">Edit</button></li>
       <li><button class="button-error btn-small pure-button" @click="deleteComment">Delete</button></li>
-      <li><button class="btn-small pure-button" @click="emit('createComment', props.post._id)">Reply</button></li>
+      <li><button class="btn-small pure-button" @click="emit('replyComment', props.comment._id)">Reply</button></li>
     </menu>
     <article class="timestamp">
       <p v-if="props.comment.dateCreated !== props.comment.dateUpdated">Edited on: {{ formatDate(props.comment.dateUpdated) }}</p>

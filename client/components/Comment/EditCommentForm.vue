@@ -11,18 +11,17 @@ const editComment = async (content: string) => {
   try {
     await fetchy(`/api/comment/${props.comment._id}`, "PATCH", { body: { content: content } });
   } catch (e) {
-    console.log(e);
     return;
   }
-  emit("editComment");
   emit("refreshComments");
+  emit("editComment");
 };
 </script>
 
 <template>
   <form @submit.prevent="editComment(content)">
     <p class="author">{{ props.comment.author }}</p>
-    <textarea id="content" v-model="content" placeholder="Create a comment!" required> </textarea>
+    <textarea id="content" v-model="content" placeholder="Edit comment!" required> </textarea>
     <div class="base">
       <menu>
         <li><button class="btn-small pure-button-primary pure-button" type="submit">Save</button></li>

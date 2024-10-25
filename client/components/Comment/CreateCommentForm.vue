@@ -1,20 +1,23 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
+import { formatDate } from "../../utils/formatDate";
 
 const content = ref("");
-const props = defineProps(["post"]);
-const emit = defineEmits(["refreshComments"]);
+const props = defineProps(["post", "comment"]);
+const emit = defineEmits(["refreshComments", "replyComment"]);
 
 const createComment = async (content: string) => {
   try {
-    await fetchy(`/api/comment/:${props.post._id}`, "POST", {
+    await fetchy(`/api/comment/${props.post._id}`, "POST", {
       body: { content: content, itemToReplyTo: props.post._id },
     });
-  } catch (_) {
+  } catch (e) {
+    console.log(e);
     return;
   }
   emit("refreshComments");
+  emit("replyComment");
   emptyForm();
 };
 
@@ -25,8 +28,16 @@ const emptyForm = () => {
 
 <template>
   <form @submit.prevent="createComment(content)">
+    <p class="author">{{ props.comment.author }}</p>
     <textarea id="content" v-model="content" placeholder="Create a comment!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button">Post comment</button>
+    <div class="base">
+      <menu>
+        <li><button class="btn-small pure-button" type="submit">Post comment</button></li>
+        <li><button class="btn-small pure-button" @click="emit('replyComment')">Cancel</button></li>
+      </menu>
+      <p v-if="props.comment.dateCreated !== props.comment.dateUpdated" class="timestamp">Edited on: {{ formatDate(props.comment.dateUpdated) }}</p>
+      <p v-else class="timestamp">Created on: {{ formatDate(props.comment.dateCreated) }}</p>
+    </div>
   </form>
 </template>
 
