@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import PostGroupComponent from "@/components/Post/PostGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { storeToRefs } from "pinia";
-import GroupListComponent from "@/components/Groups/GroupListComponent.vue";
 const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
 </script>
 
@@ -11,7 +11,7 @@ const { currentUsername, isLoggedIn } = storeToRefs(useUserStore());
     <section>
       {{ $route.params.id }}
     </section>
-    <GroupListComponent />
+    <PostGroupComponent />
   </main>
 </template>
 

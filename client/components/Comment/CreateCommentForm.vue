@@ -8,10 +8,17 @@ const props = defineProps(["post", "comment"]);
 const emit = defineEmits(["refreshComments", "replyComment"]);
 
 const createComment = async (content: string) => {
+  console.log(props.post._id, props.comment._id);
   try {
-    await fetchy(`/api/comment/${props.post._id}`, "POST", {
-      body: { content: content, itemToReplyTo: props.post._id },
-    });
+    if (props.post._id) {
+      await fetchy(`/api/comment/${props.post._id}`, "POST", {
+        body: { content: content, itemToReplyTo: props.post._id },
+      });
+    } else if (props.comment._id) {
+      await fetchy(`/api/comment/${props.comment._id}`, "POST", {
+        body: { content: content, itemToReplyTo: props.comment._id },
+      });
+    }
   } catch (e) {
     console.log(e);
     return;

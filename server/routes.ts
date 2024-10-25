@@ -93,6 +93,12 @@ class Routes {
     return Responses.posts(posts);
   }
 
+  @Router.get("/groupPosts")
+  async getPostsById(group: string) {
+    const posts = await Posting.getPostByGroup(group);
+    return Responses.posts(posts);
+  }
+
   @Router.post("/posts")
   async createPost(session: SessionDoc, groupNameToPostIn: string, content: string, options?: PostOptions) {
     const user = Sessioning.getUser(session);
@@ -101,7 +107,7 @@ class Routes {
     if (!targetGroup) {
       throw new Error("User not in group!");
     }
-    const created = await Posting.create(user, content, options);
+    const created = await Posting.create(user, groupNameToPostIn, content, options);
     const messages = [created.msg];
     const userBadges = await Milestoning.getBadges(user);
     if (userBadges !== null) {

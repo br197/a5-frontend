@@ -42,6 +42,8 @@ function makeReply(id: string) {
   replying.value = id;
 }
 
+console.log(replying);
+
 onBeforeMount(async () => {
   await getCommentsById();
 });
@@ -51,10 +53,12 @@ onBeforeMount(async () => {
   <p class="author">{{ props.post.author }}</p>
   <p class="postContent">{{ props.post.content }}</p>
   <div class="base">
-    <menu v-if="props.post.author == currentUsername">
-      <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
-      <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
-      <li><button class="btn-small pure-button" @click="emit('replyComment', props.post._id)">Reply</button></li>
+    <menu>
+      <menu v-if="props.post.author == currentUsername">
+        <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
+        <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
+      </menu>
+      <button class="btn-small pure-button" @click="updateCommenting(props.post._id)">Comment</button>
     </menu>
     <article class="timestamp">
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
@@ -65,8 +69,8 @@ onBeforeMount(async () => {
     <h4>Comments:</h4>
     <article v-for="comment in comments" :key="comment._id">
       <CommentComponent v-if="editing !== comment._id && replying !== comment._id && replying !== props.post._id" :comment="comment" @editComment="updateCommenting" />
-      <CreateCommentForm v-if="replying === comment._id || replying === props.post._id" :comment="comment" @replyComment="makeReply" @refreshComments="getCommentsById" />
-      <EditCommentForm v-else-if="editing === comment._id" :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
+      <CreateCommentForm :comment="comment" @replyComment="makeReply" @refreshComments="getCommentsById" />
+      <EditCommentForm v-if="editing === comment._id" :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
     </article>
   </section>
 </template>
