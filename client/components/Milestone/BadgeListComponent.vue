@@ -8,7 +8,7 @@ import { onBeforeMount, ref } from "vue";
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
-let badges = ref<Record<string, boolean>>([]);
+let badges = ref();
 
 async function getBadges() {
   let badgeResults;

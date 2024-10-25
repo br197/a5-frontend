@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { useUserStore } from "@/stores/user";
-import { storeToRefs } from "pinia";
-import { fetchy } from "@/utils/fetchy";
 import LocationOptForm from "@/components/Mapping/LocationOptForm.vue";
-import SearchLocationForm from "@/components/Mapping/SearchLocationForm.vue";
-import LocationUserComponent from "@/components/Mapping/LocationUserComponent.vue";
-import { onBeforeMount, ref } from "vue";
 import LocationUpdateForm from "@/components/Mapping/LocationUpdateForm.vue";
+import LocationUserComponent from "@/components/Mapping/LocationUserComponent.vue";
+import SearchLocationForm from "@/components/Mapping/SearchLocationForm.vue";
+import { useUserStore } from "@/stores/user";
+import { fetchy } from "@/utils/fetchy";
+import { storeToRefs } from "pinia";
+import { onBeforeMount, ref } from "vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
 
@@ -35,13 +35,13 @@ async function getCurrentLocation() {
   try {
     location = await fetchy("/api/maps/currentLocation", "GET");
   } catch (e) {
-    userLocation.value = null;
+    userLocation.value = "";
     return;
   }
 
   userLocation.value = location;
-  printCity.value = userLocation.value.map.city.toUpperCase();
-  printState.value = userLocation.value.map.state.toUpperCase();
+  printCity.value = city.value.toUpperCase();
+  printState.value = selectedState.value.toUpperCase();
 }
 
 onBeforeMount(async () => {
@@ -64,7 +64,7 @@ onBeforeMount(async () => {
       <h2 v-if="city && selectedState">Users Nearby You:</h2>
       <h2 v-else>Search to Find Nearby Users</h2>
       <section class="users" v-if="loaded && users.length !== 0 && userLocation">
-        <article v-for="user in users.map" :key="user._id">
+        <article v-for="user in users.map" :key="user">
           <LocationUserComponent :user="user" @refreshLocation="getCurrentLocation" />
         </article>
       </section>
