@@ -10,7 +10,7 @@ export interface PostOptions {
 export interface PostDoc extends BaseDoc {
   author: ObjectId;
   content: string;
-  group: string;
+  groupId: ObjectId;
   options?: PostOptions;
 }
 
@@ -27,8 +27,8 @@ export default class PostingConcept {
     this.posts = new DocCollection<PostDoc>(collectionName);
   }
 
-  async create(author: ObjectId, group: string, content: string, options?: PostOptions) {
-    const _id = await this.posts.createOne({ author, group, content, options });
+  async create(author: ObjectId, groupId: ObjectId, content: string, options?: PostOptions) {
+    const _id = await this.posts.createOne({ author, groupId, content, options });
     return { msg: "Post successfully created!", post: await this.posts.readOne({ _id }) };
   }
 
@@ -41,8 +41,8 @@ export default class PostingConcept {
     return await this.posts.readMany({ author });
   }
 
-  async getPostByGroup(group: string) {
-    return await this.posts.readMany({ group });
+  async getPostByGroup(groupId: ObjectId) {
+    return await this.posts.readMany({ groupId });
   }
 
   async update(_id: ObjectId, content?: string, options?: PostOptions) {

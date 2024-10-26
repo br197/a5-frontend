@@ -14,7 +14,7 @@ const loaded = ref(false);
 let users = ref<Array<Record<string, string>>>([]);
 const city = ref("");
 const selectedState = ref("");
-const userLocation = ref("");
+const userLocation = ref();
 const printCity = ref("");
 const printState = ref("");
 
@@ -40,8 +40,14 @@ async function getCurrentLocation() {
   }
 
   userLocation.value = location;
-  printCity.value = city.value.toUpperCase();
-  printState.value = selectedState.value.toUpperCase();
+
+  if (typeof userLocation.value === "string") {
+    printCity.value = "";
+    printState.value = "";
+  } else {
+    printCity.value = userLocation.value.map.city.toUpperCase();
+    printState.value = userLocation.value.map.state.toUpperCase();
+  }
 }
 
 onBeforeMount(async () => {

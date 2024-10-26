@@ -4,7 +4,7 @@ import { fetchy } from "../../utils/fetchy";
 
 const groupName = ref("");
 const groupDescription = ref("");
-const resource = false;
+const resource = true;
 const emit = defineEmits(["refreshGroups"]);
 
 const createUserGroup = async (groupName: string, groupDescription: string, resource: boolean) => {

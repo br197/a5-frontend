@@ -4,13 +4,16 @@ import { fetchy } from "../../utils/fetchy";
 
 const content = ref("");
 const emit = defineEmits(["refreshPosts"]);
+const props = defineProps(["groupId"]);
 
 const createPost = async (content: string) => {
+  console.log(props.groupId);
   try {
     await fetchy("/api/posts", "POST", {
-      body: { content },
+      body: { groupId: props.groupId, content },
     });
-  } catch (_) {
+  } catch (e) {
+    console.log(e);
     return;
   }
   emit("refreshPosts");

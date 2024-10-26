@@ -42,8 +42,6 @@ function makeReply(id: string) {
   replying.value = id;
 }
 
-console.log(replying);
-
 onBeforeMount(async () => {
   await getCommentsById();
 });

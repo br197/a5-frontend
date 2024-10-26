@@ -13,16 +13,25 @@ const props = defineProps(["group"]);
 const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
-let group = ref(props.group.groupName);
-
-async function getPostByGroup(group: string) {
+let groupName = ref();
+async function getPostByGroup() {
   let postResults;
   try {
-    postResults = await fetchy("/api/groupPosts", "GET", { query: { group: group } });
+    postResults = await fetchy(`/api/groupPosts/${props.group.id}`, "GET");
   } catch (e) {
     return;
   }
   posts.value = postResults;
+}
+
+async function getGroupsById() {
+  let groupResult;
+  try {
+    groupResult = await fetchy(`/api/groups/${props.group.id}`, "GET");
+  } catch (e) {
+    return;
+  }
+  groupName.value = groupResult.groupName;
 }
 
 function updateEditing(id: string) {
@@ -30,15 +39,17 @@ function updateEditing(id: string) {
 }
 
 onBeforeMount(async () => {
-  await getPostByGroup(group.value);
+  await getPostByGroup();
+  await getGroupsById();
   loaded.value = true;
 });
 </script>
 
 <template>
   <section v-if="isLoggedIn">
+    <h1>Welcome to the {{ groupName }} group!</h1>
     <h2>Create a post:</h2>
-    <CreatePostForm @refreshPosts="getPostByGroup" />
+    <CreatePostForm :groupId="group.id" @refreshPosts="getPostByGroup" />
   </section>
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
@@ -57,6 +68,10 @@ section {
   gap: 1em;
 }
 
+h1 {
+  margin: auto;
+  margin-top: 2em;
+}
 section,
 p,
 .row {

@@ -8,7 +8,7 @@ import { onBeforeMount, ref } from "vue";
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
-let badges = ref();
+const badges = ref<Array<[string, boolean]>>([]);
 
 async function getBadges() {
   let badgeResults;
@@ -17,7 +17,9 @@ async function getBadges() {
   } catch (_) {
     return;
   }
+  console.log(badgeResults);
   badges.value = Object.entries(badgeResults.userMilestones);
+  console.log(badges);
 }
 onBeforeMount(async () => {
   await getBadges();
@@ -27,7 +29,7 @@ onBeforeMount(async () => {
 
 <template>
   <section class="badges" v-if="loaded && isLoggedIn && badges.length !== 0">
-    <article v-for="badge in badges" :key="badge._id">
+    <article v-for="badge in badges" :key="badge[0]">
       <BadgeComponent :badge="badge" />
     </article>
   </section>

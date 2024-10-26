@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import CreateUserGroupForm from "@/components/Groups/CreateUserGroupForm.vue";
+import CreateResourceGroupForm from "@/components/Groups/CreateResourceGroupForm.vue";
 import EditGroupDescriptionForm from "@/components/Groups/EditGroupDescriptionForm.vue";
 import EditGroupNameForm from "@/components/Groups/EditGroupNameForm.vue";
 import GroupComponent from "@/components/Groups/GroupComponent.vue";
@@ -40,18 +40,18 @@ onBeforeMount(async () => {
   loaded.value = true;
 });
 
-const nonResourceGroup = computed(() => {
-  return groups.value.filter((group) => !group.resource);
+const resourceGroup = computed(() => {
+  return groups.value.filter((group) => group.resource);
 });
 </script>
 
 <template>
   <section v-if="isLoggedIn">
-    <h2>Create a group:</h2>
-    <CreateUserGroupForm @refreshGroups="getAllGroups" />
+    <h2>Create a Resource group:</h2>
+    <CreateResourceGroupForm @refreshGroups="getAllGroups" />
   </section>
-  <section class="groups" v-if="loaded && nonResourceGroup.length !== 0">
-    <article v-for="group in nonResourceGroup" :key="group._id">
+  <section class="groups" v-if="loaded && resourceGroup.length !== 0">
+    <article v-for="group in resourceGroup" :key="group._id">
       <GroupComponent
         v-if="editingName !== group._id && editingDescription !== group._id"
         :group="group"
@@ -63,7 +63,7 @@ const nonResourceGroup = computed(() => {
       <EditGroupDescriptionForm v-else :group="group" @refreshGroups="getAllGroups" @editGroupDescription="updateDescriptionEditing" />
     </article>
   </section>
-  <p v-else-if="loaded">No groups found</p>
+  <p v-else-if="loaded">No resource groups found</p>
   <p v-else>Loading...</p>
 </template>
 

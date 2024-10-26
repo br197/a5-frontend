@@ -93,21 +93,23 @@ class Routes {
     return Responses.posts(posts);
   }
 
-  @Router.get("/groupPosts")
-  async getPostsById(group: string) {
-    const posts = await Posting.getPostByGroup(group);
+  @Router.get("/groupPosts/:id")
+  async getPostsById(id: string) {
+    const oid = new ObjectId(id);
+    const posts = await Posting.getPostByGroup(oid);
     return Responses.posts(posts);
   }
 
   @Router.post("/posts")
-  async createPost(session: SessionDoc, groupNameToPostIn: string, content: string, options?: PostOptions) {
+  async createPost(session: SessionDoc, groupId: string, content: string, options?: PostOptions) {
     const user = Sessioning.getUser(session);
     const groups = await Grouping.getUserGroups(user);
-    const targetGroup = groups.userGroups.find((group) => group.groupName === groupNameToPostIn);
+    const oid = new ObjectId(groupId);
+    const targetGroup = groups.userGroups.find((group) => group._id.toString() === oid.toString());
     if (!targetGroup) {
-      throw new Error("User not in group!");
+      throw new Error("Can't make post because user is not in group!");
     }
-    const created = await Posting.create(user, groupNameToPostIn, content, options);
+    const created = await Posting.create(user, oid, content, options);
     const messages = [created.msg];
     const userBadges = await Milestoning.getBadges(user);
     if (userBadges !== null) {
@@ -194,12 +196,19 @@ class Routes {
     return await Responses.groups(groups);
   }
 
-  @Router.get("/groups/:username")
-  async getUserGroups(username: string) {
+  @Router.get("/userGroups")
+  async getUserGroups(session: SessionDoc) {
     let groups;
-    const id = (await Authing.getUserByUsername(username))._id;
-    groups = await Grouping.getUserGroups(id);
+    const user = Sessioning.getUser(session);
+    groups = await Grouping.getUserGroups(user);
     return { msg: groups.msg, groups: await Responses.groups(groups.userGroups) };
+  }
+
+  @Router.get("/groups/:id")
+  async getGroupsById(id: string) {
+    const oid = new ObjectId(id);
+    const group = await Grouping.getGroupById(oid);
+    return Responses.group(group);
   }
 
   @Router.get("/resourceGroups")

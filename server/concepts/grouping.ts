@@ -37,9 +37,11 @@ export default class GroupingConcept {
     const group = await this.groups.readMany({});
     const userGroups: Array<GroupDoc> = [];
     if (group) {
-      for (var g of group) {
+      for (const g of group) {
         if (g.groupMembers.some((member) => member.toString() === _id.toString() || g.groupOwner.toString() === _id.toString())) {
-          userGroups.push(g);
+          if (!g.resource) {
+            userGroups.push(g);
+          }
         }
       }
     }
@@ -89,11 +91,12 @@ export default class GroupingConcept {
   */
   async joinGroup(addedGroupMember: ObjectId, _id: ObjectId) {
     const group = await this.groups.readOne({ _id });
+    console.log(group);
     if (!group) {
       throw new NotFoundError(`Group does not exist!`);
     } else if (group.resource) {
       throw new Error("Users can't join resource groups!");
-    } else if (group.groupMembers.some((member) => member.toString() === addedGroupMember.toString()) || group.groupOwner.toString() === addedGroupMember.toString()) {
+    } else if (group.groupMembers.some((member) => member.toString() === addedGroupMember.toString())) {
       throw new Error("User already in group!");
     }
     const groupMembers: Array<ObjectId> = group.groupMembers;
@@ -176,6 +179,10 @@ export default class GroupingConcept {
     if (group.groupOwner.toString() !== user.toString()) {
       throw new GroupOwnerNotMatchError(user, _id);
     }
+  }
+
+  async getGroupById(_id: ObjectId) {
+    return await this.groups.readOne({ _id });
   }
 }
 
