@@ -49,10 +49,10 @@ export default class GroupingConcept {
   }
 
   /*
-  Get all resource groups.
+  Get all resource groups of user.
   */
-  async getResourceGroups() {
-    return await this.groups.readMany({ resource: true }, { sort: { _id: -1 } });
+  async getResourceGroups(user: ObjectId) {
+    return await this.groups.readMany({ groupOwner: user, resource: true }, { sort: { _id: -1 } });
   }
 
   /*

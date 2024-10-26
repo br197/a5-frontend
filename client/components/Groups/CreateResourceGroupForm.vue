@@ -4,18 +4,17 @@ import { fetchy } from "../../utils/fetchy";
 
 const groupName = ref("");
 const groupDescription = ref("");
-const resource = true;
-const emit = defineEmits(["refreshGroups"]);
+const emit = defineEmits(["refreshResource"]);
 
-const createUserGroup = async (groupName: string, groupDescription: string, resource: boolean) => {
+const createResourceGroup = async (groupName: string, groupDescription: string) => {
   try {
-    await fetchy("/api/groups", "POST", {
-      body: { groupName, groupDescription, resource },
+    await fetchy("/api/resourceGroups", "POST", {
+      body: { groupName, groupDescription },
     });
   } catch (_) {
     return;
   }
-  emit("refreshGroups");
+  emit("refreshResource");
   emptyForm();
 };
 
@@ -26,7 +25,7 @@ const emptyForm = () => {
 </script>
 
 <template>
-  <form @submit.prevent="createUserGroup(groupName, groupDescription, resource)">
+  <form @submit.prevent="createResourceGroup(groupName, groupDescription)">
     <label for="groupName">Group name:</label>
     <textarea id="groupName" v-model="groupName" placeholder="Write your group name here" required> </textarea>
     <label for="description">Group Description:</label>

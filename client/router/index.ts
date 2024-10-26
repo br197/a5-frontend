@@ -4,11 +4,13 @@ import { createRouter, createWebHistory } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import GroupPostsView from "../views/GroupPostsView.vue";
 import GroupView from "../views/GroupView.vue";
+import HelpsView from "../views/HelpsView.vue";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/LoginView.vue";
 import MapView from "../views/MapView.vue";
 import MilestoneView from "../views/MilestoneView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
+import ResourcesView from "../views/ResourcesView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -20,9 +22,21 @@ const router = createRouter({
       component: HomeView,
     },
     {
+      path: "/resource/:id",
+      name: "Resources",
+      component: ResourcesView,
+      meta: { requiresAuth: true },
+    },
+    {
       path: "/setting",
       name: "Settings",
       component: SettingView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/help",
+      name: "Help",
+      component: HelpsView,
       meta: { requiresAuth: true },
     },
     {

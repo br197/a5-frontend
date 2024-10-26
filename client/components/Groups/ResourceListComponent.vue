@@ -1,30 +1,29 @@
 <script setup lang="ts">
 import CreateResourceGroupForm from "@/components/Groups/CreateResourceGroupForm.vue";
-import EditGroupDescriptionForm from "@/components/Groups/EditGroupDescriptionForm.vue";
-import EditGroupNameForm from "@/components/Groups/EditGroupNameForm.vue";
-import GroupComponent from "@/components/Groups/GroupComponent.vue";
+import EditResourceDescriptionForm from "@/components/Groups/EditResourceDescriptionForm.vue";
+import EditResourceNameForm from "@/components/Groups/EditResourceNameForm.vue";
+import ResourceGroupComponent from "@/components/Groups/ResourceGroupComponent.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
-import { computed, onBeforeMount, ref } from "vue";
+import { onBeforeMount, ref } from "vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
 
 const loaded = ref(false);
+let resourceGroups = ref<Array<Record<string, string>>>([]);
 let editingName = ref("");
 let editingDescription = ref("");
-let groups = ref<Array<Record<string, string>>>([]);
 
-async function getAllGroups() {
+async function getAllResourceGroups() {
   let groupResults;
   try {
-    groupResults = await fetchy(`/api/allGroups`, "GET");
-  } catch (_) {
+    groupResults = await fetchy(`/api/resourceGroups`, "GET");
+  } catch (e) {
     return;
   }
 
-  groups.value = groupResults;
-  console.log(groups);
+  resourceGroups.value = groupResults.groups;
 }
 
 function updateNameEditing(id: string) {
@@ -36,31 +35,27 @@ function updateDescriptionEditing(id: string) {
 }
 
 onBeforeMount(async () => {
-  await getAllGroups();
+  await getAllResourceGroups();
   loaded.value = true;
-});
-
-const resourceGroup = computed(() => {
-  return groups.value.filter((group) => group.resource);
 });
 </script>
 
 <template>
   <section v-if="isLoggedIn">
     <h2>Create a Resource group:</h2>
-    <CreateResourceGroupForm @refreshGroups="getAllGroups" />
+    <CreateResourceGroupForm @refreshResource="getAllResourceGroups" />
   </section>
-  <section class="groups" v-if="loaded && resourceGroup.length !== 0">
-    <article v-for="group in resourceGroup" :key="group._id">
-      <GroupComponent
-        v-if="editingName !== group._id && editingDescription !== group._id"
-        :group="group"
-        @refreshGroups="getAllGroups"
+  <section class="groups" v-if="loaded && resourceGroups.length !== 0">
+    <article v-for="resource in resourceGroups" :key="resource._id">
+      <ResourceGroupComponent
+        v-if="editingName !== resource._id && editingDescription !== resource._id"
+        :resource="resource"
+        @refreshResource="getAllResourceGroups"
         @editGroupName="updateNameEditing"
         @editGroupDescription="updateDescriptionEditing"
       />
-      <EditGroupNameForm v-else-if="editingDescription !== group._id" :group="group" @refreshGroups="getAllGroups" @editGroupName="updateNameEditing" />
-      <EditGroupDescriptionForm v-else :group="group" @refreshGroups="getAllGroups" @editGroupDescription="updateDescriptionEditing" />
+      <EditResourceNameForm v-else-if="editingDescription !== resource._id" :resource="resource" @refreshResource="getAllResourceGroups" @editGroupName="updateNameEditing" />
+      <EditResourceDescriptionForm v-else :resource="resource" @refreshResource="getAllResourceGroups" @editGroupDescription="updateDescriptionEditing" />
     </article>
   </section>
   <p v-else-if="loaded">No resource groups found</p>

@@ -19,12 +19,11 @@ async function getAllGroups() {
   let groupResults;
   try {
     groupResults = await fetchy(`/api/allGroups`, "GET");
-  } catch (_) {
+  } catch (e) {
     return;
   }
 
   groups.value = groupResults;
-  console.log(groups);
 }
 
 function updateNameEditing(id: string) {

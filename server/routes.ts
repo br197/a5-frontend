@@ -212,9 +212,10 @@ class Routes {
   }
 
   @Router.get("/resourceGroups")
-  async getResourceGroups() {
+  async getResourceGroups(session: SessionDoc) {
     let groups;
-    groups = await Grouping.getResourceGroups();
+    const user = Sessioning.getUser(session);
+    groups = await Grouping.getResourceGroups(user);
     return { msg: "Retrieved all resource groups!", groups: await Responses.groups(groups) };
   }
 
@@ -226,7 +227,7 @@ class Routes {
     return { msg: created.msg, group: await Responses.group(created.group) };
   }
 
-  @Router.post("/resourceGroups/add/:resourceId")
+  @Router.post("/resourceGroups/:id")
   async addResourceToGroup(session: SessionDoc, resourceId: ObjectId, groupName: string) {
     const user = Sessioning.getUser(session);
     const posts = await Posting.getPosts();
