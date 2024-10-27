@@ -6,7 +6,7 @@ const route = useRoute();
 
 <template>
   <main>
-    <ResourceItemComponent :resourceGroup="{ id: route.params.id }" />
+    <ResourceItemComponent />
   </main>
 </template>
 

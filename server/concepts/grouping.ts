@@ -56,6 +56,16 @@ export default class GroupingConcept {
   }
 
   /*
+  Get all resources in group.
+  */
+  async getResources(_id: ObjectId) {
+    const group = await this.groups.readOne({ _id });
+    if (group) {
+      return group.groupMembers;
+    }
+    throw new NotFoundError("Group doesn't exist!");
+  }
+  /*
   Create a group.
   */
   async createGroup(groupOwner: ObjectId, groupName: string, groupDescription: string, resource: boolean) {
@@ -71,10 +81,10 @@ export default class GroupingConcept {
   /*
     Add Resource to a group.
   */
-  async addResourceToGroup(user: ObjectId, addedResource: ObjectId, groupName: string) {
-    const group = await this.groups.readOne({ groupName });
+  async addResourceToGroup(user: ObjectId, addedResource: ObjectId, _id: ObjectId) {
+    const group = await this.groups.readOne({ _id });
     if (!group) {
-      throw new NotFoundError(`Group ${groupName} does not exist!`);
+      throw new NotFoundError(`Group does not exist!`);
     } else if (!(group.groupOwner.toString() === user.toString())) {
       throw new Error("You cannot add resources to the group, as you are not the owner of the group!");
     } else if (group.groupMembers.some((member) => member.toString() === addedResource.toString())) {
@@ -82,8 +92,8 @@ export default class GroupingConcept {
     }
     const groupMembers: Array<ObjectId> = group.groupMembers;
     groupMembers.push(addedResource);
-    await this.groups.partialUpdateOne({ groupName }, { groupMembers });
-    return { msg: `Resource successfully added to ${groupName} group!`, group: await this.groups.readOne({ groupName }) };
+    await this.groups.partialUpdateOne({ _id }, { groupMembers });
+    return { msg: `Resource successfully added to group!`, group: await this.groups.readOne({ _id }) };
   }
 
   /*
@@ -139,20 +149,20 @@ export default class GroupingConcept {
   /*
   Remove resource from a resource group.
   */
-  async leaveResourceGroup(_id: ObjectId, groupName: string, resourceId: ObjectId) {
-    const group = await this.groups.readOne({ groupName });
+  async leaveResourceGroup(user: ObjectId, _id: ObjectId, resourceId: ObjectId) {
+    const group = await this.groups.readOne({ _id });
     if (!group) {
-      throw new NotFoundError(`Group ${groupName} does not exist!`);
-    } else if (!(group.groupOwner.toString() === _id.toString())) {
+      throw new NotFoundError(`Group does not exist!`);
+    } else if (!(group.groupOwner.toString() === user.toString())) {
       throw new Error("User not owner of group!");
     } else if (group.groupMembers.some((member) => member.toString() === resourceId.toString())) {
       const index = group.groupMembers.findIndex((member) => member.toString() === resourceId.toString());
       group.groupMembers.splice(index, 1);
-      await this.groups.partialUpdateOne({ groupName }, { groupMembers: group.groupMembers });
+      await this.groups.partialUpdateOne({ _id }, { groupMembers: group.groupMembers });
     } else {
       throw new NotFoundError(`Unable to delete item, because item not in group!`);
     }
-    return { msg: `Resource successfully removed from the ${groupName} group!` };
+    return { msg: `Resource successfully removed from group!` };
   }
 
   /*

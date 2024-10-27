@@ -2,6 +2,7 @@
 import CommentComponent from "@/components/Comment/CommentComponent.vue";
 import CreateCommentForm from "@/components/Comment/CreateCommentForm.vue";
 import EditCommentForm from "@/components/Comment/EditCommentForm.vue";
+import router from "@/router";
 import { useUserStore } from "@/stores/user";
 import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
@@ -18,7 +19,16 @@ let comments = ref<Array<Record<string, string>>>([]);
 const deletePost = async () => {
   try {
     await fetchy(`/api/posts/${props.post._id}`, "DELETE");
-  } catch {
+  } catch (e) {
+    return;
+  }
+  emit("refreshPosts");
+};
+
+const addResourceGroup = async () => {
+  try {
+    await fetchy(`/api/resourceGroups/{props.post._id}`, "POST");
+  } catch (e) {
     return;
   }
   emit("refreshPosts");
@@ -56,7 +66,8 @@ onBeforeMount(async () => {
         <li><button class="btn-small pure-button" @click="emit('editPost', props.post._id)">Edit</button></li>
         <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
       </menu>
-      <button class="btn-small pure-button" @click="updateCommenting(props.post._id)">Comment</button>
+      <button class="btn-small pure-button">Comment</button>
+      <button class="btn-small pure-button" @click="router.push(`/resourceSelect`)">Add Post To Folder</button>
     </menu>
     <article class="timestamp">
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
@@ -67,8 +78,8 @@ onBeforeMount(async () => {
     <h4>Comments:</h4>
     <article v-for="comment in comments" :key="comment._id">
       <CommentComponent v-if="editing !== comment._id && replying !== comment._id && replying !== props.post._id" :comment="comment" @editComment="updateCommenting" />
-      <CreateCommentForm :comment="comment" @replyComment="makeReply" @refreshComments="getCommentsById" />
-      <EditCommentForm v-if="editing === comment._id" :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
+      <CreateCommentForm v-else-if="replying === comment._id || replying !== props.post._id" :comment="comment" @replyComment="makeReply" @refreshComments="getCommentsById" />
+      <EditCommentForm v-else-if="editing === comment._id" :comment="comment" @editComment="updateCommenting" @refreshComments="getCommentsById" />
     </article>
   </section>
 </template>

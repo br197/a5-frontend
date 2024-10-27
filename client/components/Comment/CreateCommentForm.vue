@@ -39,7 +39,7 @@ const emptyForm = () => {
     <textarea id="content" v-model="content" placeholder="Create a comment!" required> </textarea>
     <div class="base">
       <menu>
-        <li><button class="btn-small pure-button" type="submit">Post comment</button></li>
+        <li><button class="btn-small pure-button" type="submit" @click="emit('replyComment')">Post comment</button></li>
         <li><button class="btn-small pure-button" @click="emit('replyComment')">Cancel</button></li>
       </menu>
       <p v-if="props.comment.dateCreated !== props.comment.dateUpdated" class="timestamp">Edited on: {{ formatDate(props.comment.dateUpdated) }}</p>
@@ -65,5 +65,11 @@ textarea {
   padding: 0.5em;
   border-radius: 4px;
   resize: none;
+}
+
+.base {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 </style>

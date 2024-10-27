@@ -29,7 +29,7 @@ const emptyForm = () => {
   <form @submit.prevent="createPost(content)">
     <label for="content">Post Contents:</label>
     <textarea id="content" v-model="content" placeholder="Create a post!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button">Create Post</button>
+    <button type="submit" class="pure-button-primary pure-button button-color">Create Post</button>
   </form>
 </template>
 
@@ -41,6 +41,10 @@ form {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+}
+
+.button-color {
+  background-color: #1c4698;
 }
 
 textarea {

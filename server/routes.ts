@@ -94,10 +94,17 @@ class Routes {
   }
 
   @Router.get("/groupPosts/:id")
-  async getPostsById(id: string) {
+  async getPostsByGroup(id: string) {
     const oid = new ObjectId(id);
     const posts = await Posting.getPostByGroup(oid);
     return Responses.posts(posts);
+  }
+
+  @Router.get("/posts/:id")
+  async getPostsById(id: string) {
+    const oid = new ObjectId(id);
+    const post = await Posting.getPostById(oid);
+    return Responses.post(post);
   }
 
   @Router.post("/posts")
@@ -208,7 +215,7 @@ class Routes {
   async getGroupsById(id: string) {
     const oid = new ObjectId(id);
     const group = await Grouping.getGroupById(oid);
-    return Responses.group(group);
+    return await Responses.group(group);
   }
 
   @Router.get("/resourceGroups")
@@ -217,6 +224,14 @@ class Routes {
     const user = Sessioning.getUser(session);
     groups = await Grouping.getResourceGroups(user);
     return { msg: "Retrieved all resource groups!", groups: await Responses.groups(groups) };
+  }
+
+  @Router.get("/resourceGroups/:id")
+  async getResources(id: string) {
+    const oid = new ObjectId(id);
+    let resources;
+    resources = await Grouping.getResources(oid);
+    return resources;
   }
 
   @Router.post("/resourceGroups")
@@ -228,8 +243,10 @@ class Routes {
   }
 
   @Router.post("/resourceGroups/:id")
-  async addResourceToGroup(session: SessionDoc, resourceId: ObjectId, groupName: string) {
+  async addResourceToGroup(session: SessionDoc, resourceId: string, groupId: string) {
     const user = Sessioning.getUser(session);
+    const rid = new ObjectId(resourceId);
+    const gid = new ObjectId(groupId);
     const posts = await Posting.getPosts();
     const comments = await Commenting.getComments();
     let isResource: boolean = false;
@@ -253,7 +270,7 @@ class Routes {
     }
 
     let created;
-    created = await Grouping.addResourceToGroup(user, resourceId, groupName);
+    created = await Grouping.addResourceToGroup(user, rid, gid);
     return { msg: created.msg, group: await Responses.group(created.group) };
   }
 
@@ -322,10 +339,12 @@ class Routes {
     return { msg: leaving.msg };
   }
 
-  @Router.patch("/resourceGroups/remove/:resourceId")
-  async leaveResourceGroup(session: SessionDoc, groupName: string, resourceId: ObjectId) {
+  @Router.patch("/resourceGroups/:id")
+  async leaveResourceGroup(session: SessionDoc, groupId: string, id: string) {
     const user = Sessioning.getUser(session);
-    const leaving = await Grouping.leaveResourceGroup(user, groupName, resourceId);
+    const oid = new ObjectId(id);
+    const gid = new ObjectId(groupId);
+    const leaving = await Grouping.leaveResourceGroup(user, gid, oid);
     return { msg: leaving.msg };
   }
 

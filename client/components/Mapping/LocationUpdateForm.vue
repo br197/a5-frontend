@@ -98,7 +98,7 @@ const states = ref([
       <p>Selected state: {{ selectedState }}</p>
     </div>
     <div class="button-container">
-      <button type="submit" class="pure-button-primary pure-button button-full">Update My Location!</button>
+      <button type="submit" class="pure-button-primary pure-button button-full button-color">Update My Location!</button>
       <button type="button" class="pure-button-primary button-error pure-button button-full" @click="deleteMap">Opt Out My Location!</button>
     </div>
   </form>
@@ -112,6 +112,10 @@ form {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+}
+
+.button-color {
+  background-color: #1c4698;
 }
 
 .stateDropdown {

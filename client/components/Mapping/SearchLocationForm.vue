@@ -72,7 +72,7 @@ const states = ref([
           </option>
         </select>
       </div>
-      <button type="submit" class="pure-button pure-button-primary">Search</button>
+      <button type="submit" class="pure-button pure-button-primary button-color">Search</button>
     </fieldset>
   </form>
 </template>
@@ -83,6 +83,10 @@ form {
   gap: 0.5em;
   padding: 1em;
   align-items: center;
+}
+
+.button-color {
+  background-color: #1c4698;
 }
 
 .stateDropdown {

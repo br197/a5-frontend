@@ -3,30 +3,41 @@ import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
-import CommentComponent from "../Comment/CommentComponent.vue";
-import PostComponent from "../Post/PostComponent.vue";
+import ResourcePostComponent from "./ResourcePostComponent.vue";
 
 const { isLoggedIn } = storeToRefs(useUserStore());
-const props = defineProps(["resource"]);
+const props = defineProps(["resourceGroup"]);
 
 const loaded = ref(false);
-let groupName = ref("");
-let resources = ref();
+const groupName = ref("");
+const resources = ref();
+const res = ref();
 
 async function getGroupsById() {
   let groupResult;
   try {
-    groupResult = await fetchy(`/api/groups/${props.resource.id}`, "GET");
+    groupResult = await fetchy(`/api/groups/${props.resourceGroup.id}`, "GET");
   } catch (e) {
     return;
   }
   groupName.value = groupResult.groupName;
-  resources.value = groupResult.groupMembers;
-  console.log(resources);
+  resources.value = groupResult;
 }
+/** 
+async function getResources() {
+  let resourceResults;
+  try {
+    resourceResults = await fetchy(`/api/resourceGroups/${props.resourceGroup.id}`, "GET");
+  } catch (e) {
+    return;
+  }
+  res.value = resourceResults;
+}
+**/
 
 onBeforeMount(async () => {
   await getGroupsById();
+  //await getResources();
   loaded.value = true;
 });
 </script>
@@ -35,10 +46,9 @@ onBeforeMount(async () => {
   <section v-if="isLoggedIn">
     <h1>Saved Resources In {{ groupName }} Folder:</h1>
   </section>
-  <section class="groups" v-if="loaded && resources.length !== 0">
-    <article v-for="resource in resources" :key="resource._id">
-      <PostComponent :resource="resource" />
-      <CommentComponent :resource="resource" />
+  <section class="posts" v-if="loaded && resources.length !== 0">
+    <article v-for="resource in resources.groupMembers" :key="resource._id">
+      <ResourcePostComponent :resource="resource" :resourceGroup="resourceGroup" />
     </article>
   </section>
   <p v-else-if="loaded">No resources found</p>

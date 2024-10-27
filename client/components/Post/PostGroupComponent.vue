@@ -2,6 +2,7 @@
 import CreatePostForm from "@/components/Post/CreatePostForm.vue";
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
+import SearchPostForm from "@/components/Post/SearchPostForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
@@ -14,6 +15,20 @@ const loaded = ref(false);
 let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
 let groupName = ref();
+let searchAuthor = ref("");
+
+async function getPosts(author?: string) {
+  let query: Record<string, string> = author !== undefined ? { author } : {};
+  let postResults;
+  try {
+    postResults = await fetchy("/api/posts", "GET", { query });
+  } catch (_) {
+    return;
+  }
+  searchAuthor.value = author ? author : "";
+  posts.value = postResults;
+}
+
 async function getPostByGroup() {
   let postResults;
   try {
@@ -49,8 +64,13 @@ onBeforeMount(async () => {
   <section v-if="isLoggedIn">
     <h1>Welcome to the {{ groupName }} group!</h1>
     <h2>Create a post:</h2>
-    <CreatePostForm :groupId="group.id" @refreshPosts="getPostByGroup" />
+    <CreatePostForm :groupId="group" @refreshPosts="getPostByGroup" />
   </section>
+  <div class="row">
+    <h2 v-if="!searchAuthor">Posts:</h2>
+    <h2 v-else>Posts by {{ searchAuthor }}:</h2>
+    <SearchPostForm @getPostsByAuthor="getPosts" />
+  </div>
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">
       <PostComponent v-if="editing !== post._id" :post="post" @refreshPosts="getPostByGroup" @editPost="updateEditing" />
@@ -75,6 +95,13 @@ h1 {
 section,
 p,
 .row {
+  margin: 0 auto;
+  max-width: 60em;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
   margin: 0 auto;
   max-width: 60em;
 }

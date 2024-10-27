@@ -25,7 +25,7 @@ onBeforeMount(async () => {
   <header>
     <nav>
       <div class="title">
-        <img src="@/assets/images/logo.svg" />
+        <img class="logo" src="@/assets/images/flag.png" />
         <RouterLink :to="{ name: 'Home' }">
           <h1>HelloUSA</h1>
         </RouterLink>
@@ -34,7 +34,7 @@ onBeforeMount(async () => {
         <li>
           <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
-        <li v-if="isLoggedIn">
+        <li class="links" v-if="isLoggedIn">
           <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
           <RouterLink :to="{ name: 'Community Map' }" :class="{ underline: currentRouteName == 'Community Map' }"> Community Map </RouterLink>
           <RouterLink :to="{ name: 'Milestones' }" :class="{ underline: currentRouteName == 'Milestones' }"> Milestones </RouterLink>
@@ -66,6 +66,7 @@ nav {
 h1 {
   font-size: 2em;
   margin: 0;
+  color: white;
 }
 
 .title {
@@ -80,7 +81,7 @@ img {
 
 a {
   font-size: large;
-  color: black;
+  color: white;
   text-decoration: none;
 }
 
@@ -90,10 +91,20 @@ ul {
   display: flex;
   align-items: center;
   flex-direction: row;
-  gap: 1em;
+  gap: 0.5em;
 }
 
 .underline {
   text-decoration: underline;
+}
+
+a:active {
+  background-color: #1c4698;
+  color: white;
+}
+
+.logo {
+  width: 40px;
+  height: 40px;
 }
 </style>

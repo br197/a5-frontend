@@ -30,7 +30,7 @@ const emptyForm = () => {
     <textarea id="groupName" v-model="groupName" placeholder="Write your group name here" required> </textarea>
     <label for="description">Group Description:</label>
     <textarea id="description" v-model="groupDescription" placeholder="Add your group's description!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button">Create Group</button>
+    <button type="submit" class="pure-button-primary pure-button button-color">Create Group</button>
   </form>
 </template>
 
@@ -57,6 +57,10 @@ textarea {
   display: flex;
   align-items: center;
   gap: 1em;
+}
+
+.button-color {
+  background-color: #1c4698;
 }
 
 #groupName {

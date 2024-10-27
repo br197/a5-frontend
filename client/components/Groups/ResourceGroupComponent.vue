@@ -24,7 +24,7 @@ const deleteResourceGroup = async (groupName: string) => {
   <p>{{ props.resource.groupDescription }}</p>
   <div class="base">
     <menu>
-      <li><button class="btn-small pure-button" @click="router.push(`/resource/${props.resource._id}`)">Enter Group</button></li>
+      <li><button class="btn-small pure-button" @click="router.push(`/resource/${props.resource._id}`)">Open Folder</button></li>
       <menu v-if="props.resource.groupOwner == currentUsername">
         <li><button class="btn-small pure-button" @click="emit('editGroupName', props.resource._id)">Edit Name</button></li>
         <li><button class="btn-small pure-button" @click="emit('editGroupDescription', props.resource._id)">Edit Description</button></li>

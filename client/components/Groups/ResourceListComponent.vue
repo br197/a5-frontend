@@ -42,7 +42,7 @@ onBeforeMount(async () => {
 
 <template>
   <section v-if="isLoggedIn">
-    <h2>Create a Resource group:</h2>
+    <h2>Your Saved Resource Folders:</h2>
     <CreateResourceGroupForm @refreshResource="getAllResourceGroups" />
   </section>
   <section class="groups" v-if="loaded && resourceGroups.length !== 0">

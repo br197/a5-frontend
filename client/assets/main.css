@@ -23,6 +23,11 @@ a.button {
   text-decoration: none;
 }
 
+.button-color {
+  background-color: #1c4698;
+}
+
+
 .column {
   display: flex;
   flex-direction: column;

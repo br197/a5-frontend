@@ -11,6 +11,7 @@ import MapView from "../views/MapView.vue";
 import MilestoneView from "../views/MilestoneView.vue";
 import NotFoundView from "../views/NotFoundView.vue";
 import ResourcesView from "../views/ResourcesView.vue";
+import SelectedResourceGroupView from "../views/SelectedResourceGroupView.vue";
 import SettingView from "../views/SettingView.vue";
 
 const router = createRouter({
@@ -61,6 +62,12 @@ const router = createRouter({
       path: "/groups/:id",
       name: "Group Posts",
       component: GroupPostsView,
+      meta: { requiresAuth: true },
+    },
+    {
+      path: "/resourceSelect",
+      name: "Select Resource Group",
+      component: SelectedResourceGroupView,
       meta: { requiresAuth: true },
     },
     {

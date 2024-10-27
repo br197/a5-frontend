@@ -42,8 +42,11 @@ export default class Responses {
       return group;
     }
     const groupOwner = await Authing.getUserById(group.groupOwner);
-    const groupMembers = await Authing.idsToUsernames(group.groupMembers);
-    return { ...group, groupMembers: groupMembers, groupgroupOwner: groupOwner.username };
+    if (!group.resource) {
+      const groupMembers = await Authing.idsToUsernames(group.groupMembers);
+      return { ...group, groupMembers: groupMembers, groupOwner: groupOwner.username };
+    }
+    return { ...group, groupOwner: groupOwner.username };
   }
 
   /**
@@ -88,7 +91,7 @@ export default class Responses {
    */
   static async groups(groups: GroupDoc[]) {
     const groupOwners = await Authing.idsToUsernames(groups.map((group) => group.groupOwner));
-    const groupMembers = await Promise.all(groups.map((group) => Authing.idsToUsernames(group.groupMembers)));
+    const groupMembers = await Promise.all(groups.map((group) => (group.resource === false ? Authing.idsToUsernames(group.groupMembers) : group.groupMembers)));
     return groups.map((group, i) => ({ ...group, groupMembers: groupMembers[i], groupOwner: groupOwners[i] }));
   }
 
