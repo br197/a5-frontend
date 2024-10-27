@@ -8,7 +8,7 @@ const emit = defineEmits(["getPostsByAuthor"]);
 <template>
   <form @submit.prevent="emit('getPostsByAuthor', author)" class="pure-form">
     <fieldset>
-      <legend>Search by Author</legend>
+      <legend>Search Posts by Author</legend>
       <input id="author" type="text" v-model="author" placeholder="Username" />
       <button type="submit" class="pure-button pure-button-primary">Search</button>
     </fieldset>

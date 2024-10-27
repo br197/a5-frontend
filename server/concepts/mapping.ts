@@ -46,7 +46,7 @@ export default class MappingConcept {
   async findNearbyUsers(_id: ObjectId, cityString: string, stateString: string) {
     const findUserOptIn = await this.maps.readOne({ user: _id });
     if (!findUserOptIn) {
-      throw new NotAllowedError("You have not opted in your location!");
+      throw new NotAllowedError("You must opt in your location to use this feature!");
     }
     const city = cityString.toLowerCase();
     const state = stateString.toLowerCase();

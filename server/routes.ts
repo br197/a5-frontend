@@ -80,23 +80,11 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
-  @Router.get("/posts")
-  @Router.validate(z.object({ author: z.string().optional() }))
-  async getPosts(author?: string) {
-    let posts;
-    if (author) {
-      const id = (await Authing.getUserByUsername(author))._id;
-      posts = await Posting.getByAuthor(id);
-    } else {
-      posts = await Posting.getPosts();
-    }
-    return Responses.posts(posts);
-  }
-
   @Router.get("/groupPosts/:id")
   async getPostsByGroup(id: string) {
-    const oid = new ObjectId(id);
-    const posts = await Posting.getPostByGroup(oid);
+    let posts;
+    const gid = new ObjectId(id);
+    posts = await Posting.getPostByGroup(gid);
     return Responses.posts(posts);
   }
 
@@ -395,10 +383,10 @@ class Routes {
   }
 
   @Router.post("/comment/:id")
-  async createComment(session: SessionDoc, content: string, postId: string) {
+  async createComment(session: SessionDoc, content: string, id: string) {
     //create comments
     const user = Sessioning.getUser(session);
-    const oid = new ObjectId(postId);
+    const oid = new ObjectId(id);
     const created = await Commenting.addComment(user, content, oid);
     const messages = [created.msg];
     const userBadges = await Milestoning.getBadges(user);

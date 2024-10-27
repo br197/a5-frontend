@@ -1,26 +1,22 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
-import { formatDate } from "../../utils/formatDate";
 
 const content = ref("");
 const props = defineProps(["post", "comment"]);
 const emit = defineEmits(["refreshComments", "replyComment"]);
-
 const createComment = async (content: string) => {
-  console.log(props.post._id, props.comment._id);
   try {
-    if (props.post._id) {
+    if (props.post) {
       await fetchy(`/api/comment/${props.post._id}`, "POST", {
         body: { content: content, itemToReplyTo: props.post._id },
       });
-    } else if (props.comment._id) {
+    } else if (props.comment) {
       await fetchy(`/api/comment/${props.comment._id}`, "POST", {
         body: { content: content, itemToReplyTo: props.comment._id },
       });
     }
   } catch (e) {
-    console.log(e);
     return;
   }
   emit("refreshComments");
@@ -35,15 +31,16 @@ const emptyForm = () => {
 
 <template>
   <form @submit.prevent="createComment(content)">
-    <p class="author">{{ props.comment.author }}</p>
+    <div v-if="props.comment">
+      <p class="author">{{ props.comment.author }}</p>
+      <p class="commentContent">{{ props.comment.content }}</p>
+    </div>
     <textarea id="content" v-model="content" placeholder="Create a comment!" required> </textarea>
     <div class="base">
       <menu>
-        <li><button class="btn-small pure-button" type="submit" @click="emit('replyComment')">Post comment</button></li>
-        <li><button class="btn-small pure-button" @click="emit('replyComment')">Cancel</button></li>
+        <li><button class="btn-small pure-button" type="submit">Post comment</button></li>
+        <li><button class="btn-small button-error pure-button" @click="emit('replyComment')">Cancel</button></li>
       </menu>
-      <p v-if="props.comment.dateCreated !== props.comment.dateUpdated" class="timestamp">Edited on: {{ formatDate(props.comment.dateUpdated) }}</p>
-      <p v-else class="timestamp">Created on: {{ formatDate(props.comment.dateCreated) }}</p>
     </div>
   </form>
 </template>
@@ -56,6 +53,9 @@ form {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+}
+.commentContent {
+  font-size: 1.2em;
 }
 
 textarea {
@@ -71,5 +71,20 @@ textarea {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+menu {
+  display: flex;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+.author {
+  font-weight: bold;
+  font-size: 1.5em;
+}
+
+li {
+  margin-right: 0.5em;
 }
 </style>

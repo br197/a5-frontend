@@ -35,7 +35,7 @@ const route = useRoute();
     <h4><i>Milestones are a way to gain access to features on the app.</i></h4>
     <p>Before you can create a user group of your own, <strong>YOU MUST HAVE POSTED AND COMMENTED AT LEAST ONCE!</strong></p>
 
-    <h3>Now that you know the basics of HelloUSA, it is time to explore to app!</h3>
+    <h3>Now that you know the basics of HelloUSA, it is time to explore the app!</h3>
   </main>
 </template>
 

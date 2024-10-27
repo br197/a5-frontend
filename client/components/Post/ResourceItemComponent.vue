@@ -23,7 +23,7 @@ async function getGroupsById() {
   groupName.value = groupResult.groupName;
   resources.value = groupResult;
 }
-/** 
+
 async function getResources() {
   let resourceResults;
   try {
@@ -33,11 +33,10 @@ async function getResources() {
   }
   res.value = resourceResults;
 }
-**/
 
 onBeforeMount(async () => {
   await getGroupsById();
-  //await getResources();
+  await getResources();
   loaded.value = true;
 });
 </script>
@@ -48,7 +47,7 @@ onBeforeMount(async () => {
   </section>
   <section class="posts" v-if="loaded && resources.length !== 0">
     <article v-for="resource in resources.groupMembers" :key="resource._id">
-      <ResourcePostComponent :resource="resource" :resourceGroup="resourceGroup" />
+      <ResourcePostComponent :resource="resource" :resourceGroup="resourceGroup" @refreshResources="getResources" />
     </article>
   </section>
   <p v-else-if="loaded">No resources found</p>

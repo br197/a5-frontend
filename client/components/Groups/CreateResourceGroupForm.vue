@@ -26,11 +26,11 @@ const emptyForm = () => {
 
 <template>
   <form @submit.prevent="createResourceGroup(groupName, groupDescription)">
-    <label for="groupName">Group name:</label>
-    <textarea id="groupName" v-model="groupName" placeholder="Write your group name here" required> </textarea>
-    <label for="description">Group Description:</label>
-    <textarea id="description" v-model="groupDescription" placeholder="Add your group's description!" required> </textarea>
-    <button type="submit" class="pure-button-primary pure-button button-color">Create Group</button>
+    <label for="folderName">Folder name:</label>
+    <textarea id="folderName" v-model="groupName" placeholder="Write your folder name here" required> </textarea>
+    <label for="description">Folder Description:</label>
+    <textarea id="description" v-model="groupDescription" placeholder="Add your folder's description!" required> </textarea>
+    <button type="submit" class="pure-button-primary pure-button button-color">Create Folder</button>
   </form>
 </template>
 
@@ -63,7 +63,7 @@ textarea {
   background-color: #1c4698;
 }
 
-#groupName {
+#folderName {
   font-family: inherit;
   font-size: inherit;
   height: 1em;

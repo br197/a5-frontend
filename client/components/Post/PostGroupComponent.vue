@@ -2,7 +2,6 @@
 import CreatePostForm from "@/components/Post/CreatePostForm.vue";
 import EditPostForm from "@/components/Post/EditPostForm.vue";
 import PostComponent from "@/components/Post/PostComponent.vue";
-import SearchPostForm from "@/components/Post/SearchPostForm.vue";
 import { useUserStore } from "@/stores/user";
 import { fetchy } from "@/utils/fetchy";
 import { storeToRefs } from "pinia";
@@ -16,18 +15,6 @@ let posts = ref<Array<Record<string, string>>>([]);
 let editing = ref("");
 let groupName = ref();
 let searchAuthor = ref("");
-
-async function getPosts(author?: string) {
-  let query: Record<string, string> = author !== undefined ? { author } : {};
-  let postResults;
-  try {
-    postResults = await fetchy("/api/posts", "GET", { query });
-  } catch (_) {
-    return;
-  }
-  searchAuthor.value = author ? author : "";
-  posts.value = postResults;
-}
 
 async function getPostByGroup() {
   let postResults;
@@ -69,7 +56,6 @@ onBeforeMount(async () => {
   <div class="row">
     <h2 v-if="!searchAuthor">Posts:</h2>
     <h2 v-else>Posts by {{ searchAuthor }}:</h2>
-    <SearchPostForm @getPostsByAuthor="getPosts" />
   </div>
   <section class="posts" v-if="loaded && posts.length !== 0">
     <article v-for="post in posts" :key="post._id">

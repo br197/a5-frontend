@@ -45,6 +45,10 @@ export default class PostingConcept {
     return await this.posts.readMany({ groupId });
   }
 
+  async getPostByGroupAuthor(author: ObjectId, groupId: ObjectId) {
+    return await this.posts.readMany({ author, groupId });
+  }
+
   async getPostById(_id: ObjectId) {
     return await this.posts.readOne({ _id });
   }
