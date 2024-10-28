@@ -80,6 +80,19 @@ class Routes {
     return { msg: "Logged out!" };
   }
 
+  @Router.get("/posts")
+  @Router.validate(z.object({ author: z.string().optional() }))
+  async getPosts(author?: string) {
+    let posts;
+    if (author) {
+      const id = (await Authing.getUserByUsername(author))._id;
+      posts = await Posting.getByAuthor(id);
+    } else {
+      posts = await Posting.getPosts();
+    }
+    return Responses.posts(posts);
+  }
+
   @Router.get("/groupPosts/:id")
   async getPostsByGroup(id: string) {
     let posts;
@@ -426,7 +439,7 @@ class Routes {
   async createMap(session: SessionDoc, city: string, state: string) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.createMap(user, city, state);
-    return { msg: map.msg, map: await Responses.map(map.location) };
+    return { map: await Responses.map(map.location) };
   }
 
   @Router.get("/maps")
@@ -453,7 +466,7 @@ class Routes {
   async getCurrentLocation(session: SessionDoc) {
     const user = Sessioning.getUser(session);
     const map = await Mapping.getCurrentLocation(user);
-    return { msg: map.msg, map: await Responses.map(map.location) };
+    return { map: await Responses.map(map.location) };
   }
 
   @Router.patch("/maps")
