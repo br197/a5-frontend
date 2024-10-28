@@ -211,7 +211,7 @@ class Routes {
     let groups;
     const user = Sessioning.getUser(session);
     groups = await Grouping.getResourceGroups(user);
-    return { msg: "Retrieved all resource groups!", groups: await Responses.groups(groups) };
+    return { groups: await Responses.groups(groups) };
   }
 
   @Router.get("/resourceGroups/:id")
@@ -231,22 +231,22 @@ class Routes {
   }
 
   @Router.post("/resourceGroups/:id")
-  async addResourceToGroup(session: SessionDoc, resourceId: string, groupId: string) {
+  async addResourceToGroup(session: SessionDoc, id: string, groupId: string) {
     const user = Sessioning.getUser(session);
-    const rid = new ObjectId(resourceId);
+    const rid = new ObjectId(id);
     const gid = new ObjectId(groupId);
     const posts = await Posting.getPosts();
     const comments = await Commenting.getComments();
     let isResource: boolean = false;
     for (const p of posts) {
-      if (p._id.equals(resourceId)) {
+      if (p._id.equals(id)) {
         isResource = true;
         break;
       }
     }
     if (!isResource) {
       for (const c of comments) {
-        if (c._id.equals(resourceId)) {
+        if (c._id.equals(id)) {
           isResource = true;
           break;
         }

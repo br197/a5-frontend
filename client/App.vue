@@ -35,11 +35,10 @@ onBeforeMount(async () => {
           <RouterLink :to="{ name: 'Home' }" :class="{ underline: currentRouteName == 'Home' }"> Home </RouterLink>
         </li>
         <li class="links" v-if="isLoggedIn">
-          <RouterLink :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
-          <RouterLink :to="{ name: 'Community Map' }" :class="{ underline: currentRouteName == 'Community Map' }"> Community Map </RouterLink>
-          <RouterLink :to="{ name: 'Milestones' }" :class="{ underline: currentRouteName == 'Milestones' }"> Milestones </RouterLink>
-          <RouterLink :to="{ name: 'Groups' }" :class="{ underline: currentRouteName == 'Groups' }"> Groups </RouterLink>
-          <RouterLink :to="{ name: 'Help' }" :class="{ underline: currentRouteName == 'Help' }"> Help </RouterLink>
+          <RouterLink class="link" :to="{ name: 'Groups' }" :class="{ underline: currentRouteName == 'Groups' }"> Groups </RouterLink>
+          <RouterLink class="link" :to="{ name: 'Community Map' }" :class="{ underline: currentRouteName == 'Community Map' }"> Community Map </RouterLink>
+          <RouterLink class="link" :to="{ name: 'Milestones' }" :class="{ underline: currentRouteName == 'Milestones' }"> Milestones </RouterLink>
+          <RouterLink class="link" :to="{ name: 'Help' }" :class="{ underline: currentRouteName == 'Help' }"> Help </RouterLink>
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
@@ -61,6 +60,10 @@ nav {
   background-color: #b93838;
   display: flex;
   align-items: center;
+}
+
+.link {
+  margin: 10px;
 }
 
 h1 {
@@ -96,11 +99,6 @@ ul {
 
 .underline {
   text-decoration: underline;
-}
-
-a:active {
-  background-color: #1c4698;
-  color: white;
 }
 
 .logo {

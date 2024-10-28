@@ -37,7 +37,7 @@ export default class MappingConcept {
     const city = typeof cityString === "string" ? cityString.toLowerCase() : " ";
     const state = typeof stateString === "string" ? stateString.toLowerCase() : " ";
     const _id = await this.maps.createOne({ user, city, state });
-    return { msg: "You successfully opted in your location!", location: await this.maps.readOne({ _id }) };
+    return { location: await this.maps.readOne({ _id }) };
   }
 
   /**
@@ -63,7 +63,7 @@ export default class MappingConcept {
     if (!findUserOptIn) {
       throw new NotAllowedError("You have not opted in your location!");
     }
-    return { msg: "Successfuly retrieved your current opted in location!", location: await this.maps.readOne({ user: _id }) };
+    return { location: await this.maps.readOne({ user: _id }) };
   }
 
   /**

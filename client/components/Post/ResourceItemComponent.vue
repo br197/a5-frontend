@@ -11,7 +11,6 @@ const props = defineProps(["resourceGroup"]);
 const loaded = ref(false);
 const groupName = ref("");
 const resources = ref();
-const res = ref();
 
 async function getGroupsById() {
   let groupResult;
@@ -24,30 +23,19 @@ async function getGroupsById() {
   resources.value = groupResult;
 }
 
-async function getResources() {
-  let resourceResults;
-  try {
-    resourceResults = await fetchy(`/api/resourceGroups/${props.resourceGroup.id}`, "GET");
-  } catch (e) {
-    return;
-  }
-  res.value = resourceResults;
-}
-
 onBeforeMount(async () => {
   await getGroupsById();
-  await getResources();
   loaded.value = true;
 });
 </script>
 
 <template>
   <section v-if="isLoggedIn">
-    <h1>Saved Resources In {{ groupName }} Folder:</h1>
+    <h1>Saved Resources In "{{ groupName }}" Folder:</h1>
   </section>
   <section class="posts" v-if="loaded && resources.length !== 0">
     <article v-for="resource in resources.groupMembers" :key="resource._id">
-      <ResourcePostComponent :resource="resource" :resourceGroup="resourceGroup" @refreshResources="getResources" />
+      <ResourcePostComponent :resource="resource" :resourceGroup="resourceGroup" @refreshResources="getGroupsById" />
     </article>
   </section>
   <p v-else-if="loaded">No resources found</p>

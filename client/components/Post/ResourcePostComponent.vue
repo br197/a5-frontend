@@ -48,7 +48,6 @@ async function removeResource() {
   } catch (e) {
     return;
   }
-
   emit("refreshResources");
 }
 

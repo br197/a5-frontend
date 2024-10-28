@@ -88,7 +88,7 @@ export default class GroupingConcept {
     } else if (!(group.groupOwner.toString() === user.toString())) {
       throw new Error("You cannot add resources to the group, as you are not the owner of the group!");
     } else if (group.groupMembers.some((member) => member.toString() === addedResource.toString())) {
-      throw new Error("Resource already in group!");
+      throw new Error("Resource already in folder!");
     }
     const groupMembers: Array<ObjectId> = group.groupMembers;
     groupMembers.push(addedResource);

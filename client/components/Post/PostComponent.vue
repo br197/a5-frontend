@@ -2,32 +2,24 @@
 import CommentComponent from "@/components/Comment/CommentComponent.vue";
 import CreateCommentForm from "@/components/Comment/CreateCommentForm.vue";
 import EditCommentForm from "@/components/Comment/EditCommentForm.vue";
-import router from "@/router";
+import ResourceGroupSelectForm from "@/components/Groups/ResourceGroupSelectForm.vue";
 import { useUserStore } from "@/stores/user";
 import { formatDate } from "@/utils/formatDate";
 import { storeToRefs } from "pinia";
 import { onBeforeMount, ref } from "vue";
 import { fetchy } from "../../utils/fetchy";
 
-const props = defineProps(["post", "comment"]);
+const props = defineProps(["post", "comment", "group"]);
 const emit = defineEmits(["editPost", "refreshPosts", "replyComment", "makeReply"]);
 const { currentUsername } = storeToRefs(useUserStore());
 const editing = ref("");
 const replying = ref("");
+const save = ref("");
 let comments = ref<Array<Record<string, string>>>([]);
 
 const deletePost = async () => {
   try {
     await fetchy(`/api/posts/${props.post._id}`, "DELETE");
-  } catch (e) {
-    return;
-  }
-  emit("refreshPosts");
-};
-
-const addResourceGroup = async () => {
-  try {
-    await fetchy(`/api/resourceGroups/{props.post._id}`, "POST");
   } catch (e) {
     return;
   }
@@ -51,7 +43,11 @@ function updateCommenting(id: string) {
 
 function makeReply(id: string) {
   replying.value = id;
-  console.log("Replying set to:", replying.value);
+}
+
+function savePost(id: string) {
+  save.value = id;
+  console.log("saving set to:", save.value);
 }
 
 onBeforeMount(async () => {
@@ -69,13 +65,14 @@ onBeforeMount(async () => {
         <li><button class="button-error btn-small pure-button" @click="deletePost">Delete</button></li>
       </menu>
       <button class="btn-small pure-button" @click="makeReply(props.post._id)">Comment</button>
-      <button class="btn-small pure-button" @click="router.push(`/resourceSelect`)">Save Post</button>
+      <button class="btn-small pure-button" @click="savePost(props.post._id)">Save Post</button>
     </menu>
     <article class="timestamp">
       <p v-if="props.post.dateCreated !== props.post.dateUpdated">Edited on: {{ formatDate(props.post.dateUpdated) }}</p>
       <p v-else>Created on: {{ formatDate(props.post.dateCreated) }}</p>
     </article>
   </div>
+  <ResourceGroupSelectForm v-if="save === props.post._id" :post="post" @savePost="savePost" />
   <CreateCommentForm v-if="replying === props.post._id" :post="post" @replyComment="makeReply" @refreshComments="getCommentsById" />
   <section v-if="comments.length !== 0">
     <h4>Comments:</h4>

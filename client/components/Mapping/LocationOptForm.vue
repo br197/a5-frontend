@@ -88,7 +88,7 @@ const states = ref([
       </select>
       <p>Selected state: {{ selectedState }}</p>
     </div>
-    <button type="submit" class="pure-button-primary pure-button">Opt In My Location!</button>
+    <button type="submit" class="pure-button-primary pure-button button-color">Opt In My Location!</button>
   </form>
 </template>
 
@@ -100,6 +100,10 @@ form {
   flex-direction: column;
   gap: 0.5em;
   padding: 1em;
+}
+
+.button-color {
+  background-color: #1c4698;
 }
 
 .stateDropdown {

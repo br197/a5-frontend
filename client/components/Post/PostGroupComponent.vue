@@ -49,7 +49,7 @@ onBeforeMount(async () => {
 
 <template>
   <section v-if="isLoggedIn">
-    <h1>Welcome to the {{ groupName }} group!</h1>
+    <h1>Welcome to the "{{ groupName }}" group!</h1>
     <h2>Create a post:</h2>
     <CreatePostForm :groupId="group" @refreshPosts="getPostByGroup" />
   </section>
