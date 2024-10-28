@@ -39,6 +39,7 @@ onBeforeMount(async () => {
           <RouterLink class="link" :to="{ name: 'Community Map' }" :class="{ underline: currentRouteName == 'Community Map' }"> Community Map </RouterLink>
           <RouterLink class="link" :to="{ name: 'Milestones' }" :class="{ underline: currentRouteName == 'Milestones' }"> Milestones </RouterLink>
           <RouterLink class="link" :to="{ name: 'Help' }" :class="{ underline: currentRouteName == 'Help' }"> Help </RouterLink>
+          <RouterLink class="link" :to="{ name: 'Settings' }" :class="{ underline: currentRouteName == 'Settings' }"> Settings </RouterLink>
         </li>
         <li v-else>
           <RouterLink :to="{ name: 'Login' }" :class="{ underline: currentRouteName == 'Login' }"> Login </RouterLink>
